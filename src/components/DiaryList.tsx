@@ -1,10 +1,10 @@
-// src/components/DiaryList.tsx
 import React, { useEffect, useState } from "react";
 import AddDiaryForm from "./DiaryForm";
 import { DiaryEntry, NewDiaryEntry } from "../types";
 
 const DiaryList: React.FC = () => {
     const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // Obtener las entradas de diarios
     useEffect(() => {
@@ -16,6 +16,7 @@ const DiaryList: React.FC = () => {
 
     // Función para añadir un nuevo diario
     const addDiary = (newDiary: NewDiaryEntry) => {
+        setErrorMessage(null);
         fetch("http://localhost:3000/api/diaries", {
             method: "POST",
             headers: {
@@ -23,17 +24,30 @@ const DiaryList: React.FC = () => {
             },
             body: JSON.stringify(newDiary),
         })
-            .then((response) => response.json())
-            .then((addedDiary) => {
-                setDiaries([...diaries, addedDiary]); // Añadir la nueva entrada a la lista
+            .then((response) => {
+                if (!response.ok) {
+                    return response.text().then((text) => {
+                        throw new Error(text);
+                    });
+                }
+                return response.json();
             })
-            .catch((error) => console.error("Error adding diary:", error));
+            .then((addedDiary) => {
+                setDiaries([...diaries, addedDiary]);
+            })
+            .catch((error) => {
+                console.error("Error adding diary:", error);
+                setErrorMessage(error.message);
+            });
     };
 
     return (
         <div>
-            <h2>Add new entry</h2>
+            <h2>Diary List</h2>
             <AddDiaryForm onAddDiary={addDiary} />
+
+            {errorMessage && <p style={{ color: "red" }}>Error: {errorMessage}</p>}
+
             <ul>
                 {diaries.map((diary) => (
                     <li key={diary.id}>
