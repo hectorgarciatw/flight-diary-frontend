@@ -34,23 +34,25 @@ const AddDiaryForm: React.FC<AddDiaryFormProps> = ({ onAddDiary }) => {
             </div>
             <div>
                 <label>Weather</label>
-                <select value={weather} onChange={(e) => setWeather(e.target.value as Weather)}>
+                <div>
                     {Object.values(Weather).map((w) => (
-                        <option key={w} value={w}>
+                        <label key={w}>
+                            <input type="radio" name="weather" value={w} checked={weather === w} onChange={() => setWeather(w)} />
                             {w}
-                        </option>
+                        </label>
                     ))}
-                </select>
+                </div>
             </div>
             <div>
                 <label>Visibility</label>
-                <select value={visibility} onChange={(e) => setVisibility(e.target.value as Visibility)}>
+                <div>
                     {Object.values(Visibility).map((v) => (
-                        <option key={v} value={v}>
+                        <label key={v}>
+                            <input type="radio" name="visibility" value={v} checked={visibility === v} onChange={() => setVisibility(v)} />
                             {v}
-                        </option>
+                        </label>
                     ))}
-                </select>
+                </div>
             </div>
             <div>
                 <label>Comment</label>
